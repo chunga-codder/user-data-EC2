@@ -1,0 +1,46 @@
+
+start and run appache server on ec2 instance
+--------------------------------------------
+
+	#!/bin/bash
+	yum update -y
+	yum install -y httpd.x86_64
+	systemctl start httpd.service
+	systemctl enable httpd.service
+	echo “Hello World from $(hostname -f)” > /var/www/html/index.html
+
+2) Launching an nginx server home :/usr/share/nginx/html
+----------------------------
+	#!/bin/bash
+	yum update -y
+	amazon-linux-extras install nginx1.12
+	nginx -v
+	systemctl start nginx
+	systemctl enable nginx
+	chmod 2775 /usr/share/nginx/html
+	find /usr/share/nginx/html -type d -exec chmod 2775 {} \;
+	find /usr/share/nginx/html -type f exec chmod 0664 {} \;
+	echo "<h1> Hello to new user</h1>" /usr/share/nginx/html/index.html
+
+3) appache 2nd server
+----------------------------
+	#!/bin/bash
+	yum update -y
+	amazon-linux-extras install -y lamp-mariadb10.2 php7.2
+	yum install -y httpd mariadb-server
+	systemctl start httpd
+	systemctl enable httpd
+	usermod -a -G apache ec2-user
+	chown -R ec2-user:apache /var/www
+	chmod 2775 /var/www	
+	find /var/www -type d -exec chmod 2775 {} \;
+	find /var/www -type f -exec chmod 0664 {} \;
+	echo"<?php phpinfo(); ?>" > /var/www/html/phpinfo.php
+
+Setting an env for node app
+---------------------------------
+	#!/bin/bash
+	sudo -u ec2-user bash-c "echo\"
+	TITLE=Title Set From Temolate
+	\">/home/ec2-user/app.env
+
